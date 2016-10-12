@@ -228,6 +228,8 @@ def slugify(value):
     Normalizes string, converts to lowercase, removes non-alpha characters,
     and converts spaces to hyphens.
     """
+    return value.replace('/', '_');
+
     # taken from http://stackoverflow.com/a/295466
     # with some modification
     import unicodedata
@@ -247,6 +249,9 @@ def parse_args(args):
                         required=False,
                         help='Take multirredit instead of subreddit as input.'
                         'If so, provide /user/m/multireddit-name as argument')
+    PARSER.add_argument('--user', default=False, action='store_true',
+                        required=False,
+                        help='Download a user posts.')
     PARSER.add_argument('--last', metavar='l', default='', required=False,
                         help='ID of the last downloaded file.')
     PARSER.add_argument('--score', metavar='s', default=0, type=int, required=False,
@@ -328,7 +333,7 @@ def main():
     while not FINISHED:
         ITEMS = getitems(
             ARGS.reddit, multireddit=ARGS.multireddit, previd=LAST,
-            reddit_sort=sort_type)
+            reddit_sort=sort_type, user=ARGS.user)
 
         # measure time and set the program to wait 4 second between request
         # as per reddit api guidelines
@@ -425,6 +430,11 @@ def main():
                         FILENAME = '%s%s%s' % (pathsplitext(pathbasename(URL))[0], '', FILEEXT)
                     elif ARGS.filename_format == 'title':
                         FILENAME = '%s%s%s' % (slugify(ITEM['title']), FILENUM, FILEEXT)
+                        if len(FILENAME) >= 256:
+                            shortened_item_title = slugify(ITEM['title'])[:256-len(FILENAME)]
+                            FILENAME = '%s%s%s' % (shortened_item_title, FILENUM, FILEEXT)
+                    elif ARGS.filename_format == 'title-id':
+                        FILENAME = '%s%s (%s)%s' % (slugify(ITEM['title']), FILENUM, ITEM['id'], FILEEXT)
                         if len(FILENAME) >= 256:
                             shortened_item_title = slugify(ITEM['title'])[:256-len(FILENAME)]
                             FILENAME = '%s%s%s' % (shortened_item_title, FILENUM, FILEEXT)

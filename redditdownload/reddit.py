@@ -7,7 +7,7 @@ from urllib2 import urlopen, Request, HTTPError
 from json import JSONDecoder
 
 
-def getitems(subreddit, multireddit=False, previd='', reddit_sort=None):
+def getitems(subreddit, multireddit=False, previd='', reddit_sort=None, user=False):
     """Return list of items from a subreddit.
 
     :param subreddit: subreddit to load the post
@@ -36,7 +36,9 @@ def getitems(subreddit, multireddit=False, previd='', reddit_sort=None):
             print warning
             sys.exit(1)
         url = 'http://www.reddit.com/user/%s.json' % subreddit
-    if not multireddit:
+    elif user:
+        url = 'http://www.reddit.com/u/%s.json' % subreddit
+    elif not multireddit:
         if '/m/' in subreddit:
             warning = ('It looks like you are trying to fetch a multireddit. \n'
                        'Check the multireddit flag. '
