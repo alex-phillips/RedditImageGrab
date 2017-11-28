@@ -249,6 +249,9 @@ def parse_args(args):
                         required=False,
                         help='Take multirredit instead of subreddit as input.'
                         'If so, provide /user/m/multireddit-name as argument')
+    PARSER.add_argument('--user', default=False, action='store_true',
+                        required=False,
+                        help='Download a user posts.')
     PARSER.add_argument('--last', metavar='l', default='', required=False,
                         help='ID of the last downloaded file.')
     PARSER.add_argument('--score', metavar='s', default=0, type=int, required=False,
