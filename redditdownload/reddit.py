@@ -36,9 +36,9 @@ def getitems(subreddit, multireddit=False, previd='', reddit_sort=None, user=Fal
             print warning
             sys.exit(1)
         url = 'http://www.reddit.com/user/%s.json' % subreddit
-    if user:
+    else if user:
         url = 'http://www.reddit.com/u/%s.json' % subreddit
-    if not multireddit:
+    else if not multireddit:
         if '/m/' in subreddit:
             warning = ('It looks like you are trying to fetch a multireddit. \n'
                        'Check the multireddit flag. '
