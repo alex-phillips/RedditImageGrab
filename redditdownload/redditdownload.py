@@ -228,6 +228,8 @@ def slugify(value):
     Normalizes string, converts to lowercase, removes non-alpha characters,
     and converts spaces to hyphens.
     """
+    return value.replace('/', '_');
+
     # taken from http://stackoverflow.com/a/295466
     # with some modification
     import unicodedata
@@ -328,7 +330,7 @@ def main():
     while not FINISHED:
         ITEMS = getitems(
             ARGS.reddit, multireddit=ARGS.multireddit, previd=LAST,
-            reddit_sort=sort_type)
+            reddit_sort=sort_type, user=ARGS.user)
 
         # measure time and set the program to wait 4 second between request
         # as per reddit api guidelines
