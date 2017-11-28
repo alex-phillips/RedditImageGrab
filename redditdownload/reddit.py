@@ -7,7 +7,7 @@ from urllib2 import urlopen, Request, HTTPError
 from json import JSONDecoder
 
 
-def getitems(subreddit, multireddit=False, previd='', reddit_sort=None):
+def getitems(subreddit, multireddit=False, previd='', reddit_sort=None, user=false):
     """Return list of items from a subreddit.
 
     :param subreddit: subreddit to load the post
