@@ -31,7 +31,7 @@ _BS_PARSER = "html5lib"  # "lxml"  # "html5lib", "lxml", "xml", "html.parser"
 
 
 # A bit sillily extensive; still, imgur and gfycat are loved by the reddits.
-img_ext_re = r'\.(?:jpe?g|png|gif|tiff|gifv|webm)$'
+img_ext_re = r'\.(?:jpe?g|png|gif|tiff|gifv|webm|mp4)$'
 
 
 _log = logging.getLogger(__name__)
@@ -205,7 +205,7 @@ def get_get_get(url, **kwa):
     params = dict(_requests_params)
     params.update(kwa)
     reqr = get_reqr()
-    
+
     try:
         return reqr.get(url, **params)
     except Exception as exc:
