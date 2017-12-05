@@ -21,6 +21,8 @@ from .gfycat import gfycat
 from .reddit import getitems
 from .deviantart import process_deviant_url
 
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 _log = logging.getLogger('redditdownload')
 
