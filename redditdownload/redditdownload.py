@@ -430,8 +430,8 @@ def main():
                             json = urlopen(req).read()
                             data = JSONDecoder().decode(json)
                             comments = [x['data'] for x in data[1]['data']['children']]
-                            print('    First comment text: %s' % (comments[ARGS.comment_album_offset]['body']))
-                            comment_urls = re.finditer(r"[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?", comments[ARGS.comment_album_offset]['body'])
+                            print('    First comment text: %s' % (comments[int(ARGS.comment_album_offset)]['body']))
+                            comment_urls = re.finditer(r"[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?", comments[int(ARGS.comment_album_offset)]['body'])
                             for comment_url in comment_urls:
                                 comment_url = comment_url.group()
                                 comment_url = extract_urls(comment_url)
