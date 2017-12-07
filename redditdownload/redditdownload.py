@@ -446,7 +446,7 @@ def main():
                             sys.exit(error_message)
                         raise ERROR
             except Exception:
-                _log.exception("Failed to extract urls for %r", URLS)
+                _log.exception("Failed to extract urls for %r", ITEM['url'])
                 continue
             for URL in URLS:
                 try:
