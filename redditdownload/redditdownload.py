@@ -35,10 +35,10 @@ def request(url, *ar, **kwa):
     for _try in xrange(_retries):
         try:
             res = urlopen(url, *ar, **kwa)
-        except HTTPError as ERROR:
+        except HTTPError as exc:
             if _try == _retries - 1:
                 raise
-            error_message = '\tHTTP ERROR: Code %s for %s' % (ERROR.code, url)
+            error_message = '\tHTTP ERROR: Code %s for %s' % (exc.code, url)
             print("Try %r err %r  (%r) %s" % (
                 _try, exc, url, error_message))
         except Exception as exc:
@@ -425,10 +425,11 @@ def main():
                         json = urlopen(req).read()
                         data = JSONDecoder().decode(json)
                         comments = [x['data'] for x in data[1]['data']['children']]
-                        comment_urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', comments[0]['body'])
+                        print('    First comment text: %s' % (comments[0]['body']))
+                        comment_urls = re.finditer(r"[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?", comments[0]['body'])
                         for comment_url in comment_urls:
+                            comment_url = comment_url.group()
                             comment_url = extract_urls(comment_url)
-                            print('    Found album url ' + comment_url)
                             comment_album_urls += comment_url
 
                         if len(comment_album_urls) == 0:
@@ -437,7 +438,7 @@ def main():
                             URLS = URLS + comment_album_urls
                             COMMENTS_ALBUM = True
                     except HTTPError as ERROR:
-                        error_message = '\tHTTP ERROR: Code %s for %s' % (ERROR.code, comment_urls)
+                        error_message = '\tHTTP ERROR: Code %s for %s' % (ERROR.code, comments_url)
                         sys.exit(error_message)
                     except ValueError as ERROR:
                         if ERROR.args[0] == 'No JSON object could be decoded':
