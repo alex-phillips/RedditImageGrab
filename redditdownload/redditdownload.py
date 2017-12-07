@@ -35,6 +35,12 @@ def request(url, *ar, **kwa):
     for _try in xrange(_retries):
         try:
             res = urlopen(url, *ar, **kwa)
+        except HTTPError as ERROR:
+            if _try == _retries - 1:
+                raise
+            error_message = '\tHTTP ERROR: Code %s for %s' % (ERROR.code, url)
+            print("Try %r err %r  (%r) %s" % (
+                _try, exc, url, error_message))
         except Exception as exc:
             if _try == _retries - 1:
                 raise
