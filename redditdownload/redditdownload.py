@@ -8,7 +8,7 @@ import re
 import StringIO
 import sys
 import logging
-from urllib2 import urlopen, HTTPError, URLError
+from urllib2 import urlopen, Request, HTTPError, URLError
 from httplib import InvalidURL
 from argparse import ArgumentParser
 from os.path import (
@@ -20,6 +20,7 @@ import time
 from .gfycat import gfycat
 from .reddit import getitems
 from .deviantart import process_deviant_url
+from json import JSONDecoder
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -403,12 +404,43 @@ def main():
                 continue
 
             FILECOUNT = 0
+            COMMENTS_ALBUM = False
             try:
                 URLS = extract_urls(ITEM['url'])
+
+                # if ARGS.comments_album:
+                if re.search("album.+?comment", ITEM['title'], re.IGNORECASE):
+                    print('    Album in comments appears to be available. Attempting to find URL in top comment')
+                    comments_url = "https://www.reddit.com" + ITEM['permalink'] + ".json"
+                    comment_album_urls = []
+
+                    try:
+                        req = Request(comments_url)
+                        json = urlopen(req).read()
+                        data = JSONDecoder().decode(json)
+                        comments = [x['data'] for x in data[1]['data']['children']]
+                        comment_urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', comments[0]['body'])
+                        for comment_url in comment_urls:
+                            comment_url = extract_urls(comment_url)
+                            comment_album_urls += comment_url
+
+                        if len(comment_album_urls) == 0:
+                            print('    Failed to retrieve album from comments')
+                        else:
+                            URLS = URLS + comment_album_urls
+                            COMMENTS_ALBUM = True
+                    except HTTPError as ERROR:
+                        error_message = '\tHTTP ERROR: Code %s for %s' % (ERROR.code, url)
+                        sys.exit(error_message)
+                    except ValueError as ERROR:
+                        if ERROR.args[0] == 'No JSON object could be decoded':
+                            error_message = 'ERROR: subreddit "%s" does not exist' % (subreddit)
+                            sys.exit(error_message)
+                        raise ERROR
             except Exception:
                 _log.exception("Failed to extract urls for %r", URLS)
                 continue
-            for URL in URLS:
+            for index, URL in enumerate(URLS):
                 try:
                     # Find gfycat if requested
                     if URL.endswith('gif') and ARGS.mirror_gfycat:
@@ -429,20 +461,26 @@ def main():
 
                     # create filename based on given input from user
                     if ARGS.filename_format == 'url':
-                        FILENAME = '%s%s%s' % (pathsplitext(pathbasename(URL))[0], '', FILEEXT)
+                        FILENAME = '%s%s' % (pathsplitext(pathbasename(URL))[0], '')
                     elif ARGS.filename_format == 'title':
-                        FILENAME = '%s%s%s' % (slugify(ITEM['title']), FILENUM, FILEEXT)
+                        FILENAME = '%s%s' % (slugify(ITEM['title']), FILENUM)
                         if len(FILENAME) >= 256:
                             shortened_item_title = slugify(ITEM['title'])[:256-len(FILENAME)]
-                            FILENAME = '%s%s%s' % (shortened_item_title, FILENUM, FILEEXT)
+                            FILENAME = '%s%s' % (shortened_item_title, FILENUM)
                     elif ARGS.filename_format == 'title-id':
-                        FILENAME = '%s%s (%s)%s' % (slugify(ITEM['title']), FILENUM, ITEM['id'], FILEEXT)
+                        FILENAME = '%s%s (%s)' % (slugify(ITEM['title']), FILENUM, ITEM['id'])
                         if len(FILENAME) >= 256:
                             shortened_item_title = slugify(ITEM['title'])[:256-len(FILENAME)]
-                            FILENAME = '%s%s%s' % (shortened_item_title, FILENUM, FILEEXT)
+                            FILENAME = '%s%s' % (shortened_item_title, FILENUM)
                     else:
-                        FILENAME = '%s%s%s' % (ITEM['id'], FILENUM, FILEEXT)
+                        FILENAME = '%s%s' % (ITEM['id'], FILENUM)
                     # join file with directory
+
+                    if (COMMENTS_ALBUM):
+                        FILENAME = '%s - %s%s' % (FILENAME, index, FILEEXT)
+                    else:
+                        FILENAME = '%s%s' % (FILENAME, FILEEXT)
+
                     FILEPATH = pathjoin(ARGS.dir, FILENAME)
 
                     # Improve debuggability list URL before download too.
