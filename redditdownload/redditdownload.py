@@ -283,7 +283,7 @@ def parse_args(args):
                         required=False, help='Enable verbose output.')
     PARSER.add_argument('--skipAlbums', default=False, action='store_true',
                         required=False, help='Skip all albums')
-    PARSER.add_argument('--comment-album', default=False, required=False,
+    PARSER.add_argument('--comment-album', default=False, required=False, action="store_true",
                         help='Attempt to detect / download album in comments')
     PARSER.add_argument('--comment-album-offset', default=1, required=False,
                         help='Album-in-comments comment offset')
