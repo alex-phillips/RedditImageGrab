@@ -283,6 +283,10 @@ def parse_args(args):
                         required=False, help='Enable verbose output.')
     PARSER.add_argument('--skipAlbums', default=False, action='store_true',
                         required=False, help='Skip all albums')
+    PARSER.add_argument('--comment-album', default=False, required=False,
+                        help='Attempt to detect / download album in comments')
+    PARSER.add_argument('--comment-album-offset', default=1, required=False,
+                        help='Album-in-comments comment offset')
     PARSER.add_argument('--mirror-gfycat', default=False, action='store_true', required=False,
                         help='Download available mirror in gfycat.com.')
     PARSER.add_argument('--sort-type', default=None, help='Sort the subreddit.')
@@ -414,38 +418,38 @@ def main():
             try:
                 URLS = extract_urls(ITEM['url'])
 
-                # if ARGS.comments_album:
-                if re.search("album.+?comment", ITEM['title'], re.IGNORECASE):
-                    print('    Album in comments appears to be available for %s. Attempting to find URL in top comment' % (ITEM['title']))
-                    comments_url = "https://www.reddit.com" + ITEM['permalink'] + ".json"
-                    comment_album_urls = []
+                if ARGS.comment_album:
+                    if re.search("album.+?comment", ITEM['title'], re.IGNORECASE):
+                        print('    Album in comments appears to be available for %s. Attempting to find URL in top comment' % (ITEM['title']))
+                        comments_url = "https://www.reddit.com" + ITEM['permalink'] + ".json"
+                        comment_album_urls = []
 
-                    try:
-                        time.sleep(4)
-                        req = Request(comments_url)
-                        json = urlopen(req).read()
-                        data = JSONDecoder().decode(json)
-                        comments = [x['data'] for x in data[1]['data']['children']]
-                        print('    First comment text: %s' % (comments[0]['body']))
-                        comment_urls = re.finditer(r"[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?", comments[0]['body'])
-                        for comment_url in comment_urls:
-                            comment_url = comment_url.group()
-                            comment_url = extract_urls(comment_url)
-                            comment_album_urls += comment_url
+                        try:
+                            time.sleep(4)
+                            req = Request(comments_url)
+                            json = urlopen(req).read()
+                            data = JSONDecoder().decode(json)
+                            comments = [x['data'] for x in data[1]['data']['children']]
+                            print('    First comment text: %s' % (comments[ARGS.comment_album_offset]['body']))
+                            comment_urls = re.finditer(r"[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?", comments[ARGS.comment_album_offset]['body'])
+                            for comment_url in comment_urls:
+                                comment_url = comment_url.group()
+                                comment_url = extract_urls(comment_url)
+                                comment_album_urls += comment_url
 
-                        if len(comment_album_urls) == 0:
-                            print('    Failed to retrieve album from comments')
-                        else:
-                            URLS = URLS + comment_album_urls
-                            COMMENTS_ALBUM = True
-                    except HTTPError as ERROR:
-                        error_message = '\tHTTP ERROR: Code %s for %s' % (ERROR.code, comments_url)
-                        sys.exit(error_message)
-                    except ValueError as ERROR:
-                        if ERROR.args[0] == 'No JSON object could be decoded':
-                            error_message = 'ERROR: subreddit "%s" does not exist' % (subreddit)
+                            if len(comment_album_urls) == 0:
+                                print('    Failed to retrieve album from comments')
+                            else:
+                                URLS = URLS + comment_album_urls
+                                COMMENTS_ALBUM = True
+                        except HTTPError as ERROR:
+                            error_message = '\tHTTP ERROR: Code %s for %s' % (ERROR.code, comments_url)
                             sys.exit(error_message)
-                        raise ERROR
+                        except ValueError as ERROR:
+                            if ERROR.args[0] == 'No JSON object could be decoded':
+                                error_message = 'ERROR: subreddit "%s" does not exist' % (subreddit)
+                                sys.exit(error_message)
+                            raise ERROR
             except Exception:
                 _log.exception("Failed to extract urls for %r", ITEM['url'])
                 continue
