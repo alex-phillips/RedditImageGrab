@@ -421,6 +421,7 @@ def main():
                     comment_album_urls = []
 
                     try:
+                        time.sleep(2)
                         req = Request(comments_url)
                         json = urlopen(req).read()
                         data = JSONDecoder().decode(json)
