@@ -477,7 +477,7 @@ def main():
                     elif ARGS.filename_format == 'title-id':
                         FILENAME = '%s%s (%s)%s' % (slugify(ITEM['title']), FILENUM, ITEM['id'], FILEEXT)
                         if len(FILENAME) >= 256:
-                            sh  ortened_item_title = slugify(ITEM['title'])[:256-len(FILENAME)]
+                            shortened_item_title = slugify(ITEM['title'])[:256-len(FILENAME)]
                             FILENAME = '%s%s%s' % (shortened_item_title, FILENUM, FILEEXT)
                     else:
                         FILENAME = '%s%s%s' % (ITEM['id'], FILENUM, FILEEXT)
