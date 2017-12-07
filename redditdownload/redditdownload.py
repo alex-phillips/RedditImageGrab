@@ -410,7 +410,7 @@ def main():
 
                 # if ARGS.comments_album:
                 if re.search("album.+?comment", ITEM['title'], re.IGNORECASE):
-                    print('    Album in comments appears to be available for %s. Attempting to find URL in top comment', ITEM['title'])
+                    print('    Album in comments appears to be available for %s. Attempting to find URL in top comment' % (ITEM['title'])
                     comments_url = "https://www.reddit.com" + ITEM['permalink'] + ".json"
                     comment_album_urls = []
 
@@ -422,6 +422,7 @@ def main():
                         comment_urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', comments[0]['body'])
                         for comment_url in comment_urls:
                             comment_url = extract_urls(comment_url)
+                            print('    Found album url ' + comment_url)
                             comment_album_urls += comment_url
 
                         if len(comment_album_urls) == 0:
