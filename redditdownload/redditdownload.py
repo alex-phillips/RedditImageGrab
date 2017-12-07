@@ -437,7 +437,7 @@ def main():
                             URLS = URLS + comment_album_urls
                             COMMENTS_ALBUM = True
                     except HTTPError as ERROR:
-                        error_message = '\tHTTP ERROR: Code %s for %s' % (ERROR.code, url)
+                        error_message = '\tHTTP ERROR: Code %s for %s' % (ERROR.code, comment_urls)
                         sys.exit(error_message)
                     except ValueError as ERROR:
                         if ERROR.args[0] == 'No JSON object could be decoded':
@@ -477,7 +477,7 @@ def main():
                     elif ARGS.filename_format == 'title-id':
                         FILENAME = '%s%s (%s)%s' % (slugify(ITEM['title']), FILENUM, ITEM['id'], FILEEXT)
                         if len(FILENAME) >= 256:
-                            shortened_item_title = slugify(ITEM['title'])[:256-len(FILENAME)]
+                            sh  ortened_item_title = slugify(ITEM['title'])[:256-len(FILENAME)]
                             FILENAME = '%s%s%s' % (shortened_item_title, FILENUM, FILEEXT)
                     else:
                         FILENAME = '%s%s%s' % (ITEM['id'], FILENUM, FILEEXT)
