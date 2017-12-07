@@ -440,7 +440,7 @@ def main():
             except Exception:
                 _log.exception("Failed to extract urls for %r", URLS)
                 continue
-            for index, URL in enumerate(URLS):
+            for URL in URLS:
                 try:
                     # Find gfycat if requested
                     if URL.endswith('gif') and ARGS.mirror_gfycat:
@@ -461,26 +461,20 @@ def main():
 
                     # create filename based on given input from user
                     if ARGS.filename_format == 'url':
-                        FILENAME = '%s%s' % (pathsplitext(pathbasename(URL))[0], '')
+                        FILENAME = '%s%s%s' % (pathsplitext(pathbasename(URL))[0], '', FILEEXT)
                     elif ARGS.filename_format == 'title':
-                        FILENAME = '%s%s' % (slugify(ITEM['title']), FILENUM)
+                        FILENAME = '%s%s%s' % (slugify(ITEM['title']), FILENUM, FILEEXT)
                         if len(FILENAME) >= 256:
                             shortened_item_title = slugify(ITEM['title'])[:256-len(FILENAME)]
-                            FILENAME = '%s%s' % (shortened_item_title, FILENUM)
+                            FILENAME = '%s%s%s' % (shortened_item_title, FILENUM, FILEEXT)
                     elif ARGS.filename_format == 'title-id':
-                        FILENAME = '%s%s (%s)' % (slugify(ITEM['title']), FILENUM, ITEM['id'])
+                        FILENAME = '%s%s (%s)%s' % (slugify(ITEM['title']), FILENUM, ITEM['id'], FILEEXT)
                         if len(FILENAME) >= 256:
                             shortened_item_title = slugify(ITEM['title'])[:256-len(FILENAME)]
-                            FILENAME = '%s%s' % (shortened_item_title, FILENUM)
+                            FILENAME = '%s%s%s' % (shortened_item_title, FILENUM, FILEEXT)
                     else:
-                        FILENAME = '%s%s' % (ITEM['id'], FILENUM)
+                        FILENAME = '%s%s%s' % (ITEM['id'], FILENUM, FILEEXT)
                     # join file with directory
-
-                    if (COMMENTS_ALBUM):
-                        FILENAME = '%s - %s%s' % (FILENAME, index, FILEEXT)
-                    else:
-                        FILENAME = '%s%s' % (FILENAME, FILEEXT)
-
                     FILEPATH = pathjoin(ARGS.dir, FILENAME)
 
                     # Improve debuggability list URL before download too.
