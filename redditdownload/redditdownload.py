@@ -410,7 +410,7 @@ def main():
 
                 # if ARGS.comments_album:
                 if re.search("album.+?comment", ITEM['title'], re.IGNORECASE):
-                    print('    Album in comments appears to be available. Attempting to find URL in top comment')
+                    print('    Album in comments appears to be available for %s. Attempting to find URL in top comment', ITEM['title'])
                     comments_url = "https://www.reddit.com" + ITEM['permalink'] + ".json"
                     comment_album_urls = []
 
