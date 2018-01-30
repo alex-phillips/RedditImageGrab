@@ -517,6 +517,7 @@ def main():
                 except FileExistsException as ERROR:
                     print('    %s' % (ERROR,))
                     ERRORS += 1
+                    FILECOUNT += 1
                     if ARGS.update:
                         print('    Update complete, exiting.')
                         FINISHED = True
